@@ -5,7 +5,7 @@ import Constants from 'expo-constants'
 export default StyleSheet.create({
     container: {
         flex: 1,        
-        backgroundColor:'#050505',
+        backgroundColor:'#191919',
         alignItems: 'center',     
         paddingTop: Constants.statusBarHeight + 10,   
     },    
@@ -18,7 +18,7 @@ export default StyleSheet.create({
         marginBottom: 12
     },
     ibTitle:{
-        color: "#ddd",
+        color: "#bbb",
         fontSize: 19,
         alignSelf:'center',
         marginTop: 20
