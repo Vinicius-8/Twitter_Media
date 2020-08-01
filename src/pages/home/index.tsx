@@ -1,29 +1,52 @@
 import React, {useState, useEffect} from 'react'
-import {Text, View, TouchableOpacity, TextInput} from 'react-native'
+import {Text, View, TouchableOpacity, TextInput, ScrollView, Image, ProgressBarAndroid, 
+    Keyboard} from 'react-native'
 
-import styles from './homeStyles'
-import Credentials from '../../credentials'
 import { useTwitter } from "react-native-simple-twitter";
+import { useNavigation } from '@react-navigation/native';
+
+import Credentials from '../../credentials'
+import styles from './homeStyles'
+
+
+interface User {
+    id: string
+    name: string
+    screen_name: string
+    profile_image_url: string
+}
 
 
 const Home = () =>{
     const [username, setUsername] = useState('')
-
+    const [users, setUsers] = useState<User[]>([])
+    const [loadingUsers, setLoadingUsers] = useState(false)
     const { twitter } = useTwitter();
-
+    const navigation = useNavigation()
+    const maxResults = 20
 
     useEffect(()=>{
         twitter.setConsumerKey(Credentials.apiKey, Credentials.apiSecretKey)
-        twitter.setAccessToken(Credentials.accessToken, Credentials.accessTokenSecret)
-        console.log('--paresiqifunfo->');        
+        twitter.setAccessToken(Credentials.accessToken, Credentials.accessTokenSecret)         
     },[])
     
     function searchUsers(){
-        twitter.get('https://api.twitter.com/1.1/users/show.json?screen_name=kangacero_')
+        if(username===''){
+            setLoadingUsers(false)    
+            return
+        }
+        Keyboard.dismiss()
+        setLoadingUsers(true)
+        twitter.get('users/search.json', {q:username,  count: maxResults})
         .then(resp =>{
-            console.log(resp);
-            
+            setUsers(resp)   
+            setLoadingUsers(false)         
         })
+    }
+
+    function userTouched(user: User){
+        console.log('voce tocou no usuario: ', user.screen_name);
+        navigation.navigate('User', {screen_name: user.screen_name})
     }
 
     return(
@@ -36,7 +59,7 @@ const Home = () =>{
                 selectionColor={'#8888ff'}      
                 placeholderTextColor={"#444"}           
                 style={styles.ibInput}
-                onChangeText={(text: string)=> setUsername(text)}
+                onChangeText={(text: string)=> setUsername(text)}                   
                 />
 
                 <TouchableOpacity style={styles.ibButton}
@@ -46,7 +69,25 @@ const Home = () =>{
                 </TouchableOpacity>
             </View>
             <View style={styles.responseBox}>
-
+                <ScrollView showsVerticalScrollIndicator={false}>
+                {!loadingUsers ? users.map(user =>(
+                    <TouchableOpacity style={styles.rbUserBox} key={user.id}
+                        onPress={()=>{
+                                userTouched(user)
+                            }}
+                    >
+                        <Image source={{uri: user.profile_image_url}}  style={styles.rbImage}/>
+                       <View style={styles.rbTextBox}>
+                            <Text style={styles.rbName}>{user.name}</Text>
+                            <Text style={styles.rbScreenName}>@{user.screen_name}</Text>
+                       </View>
+                    </TouchableOpacity>
+                )): <ProgressBarAndroid 
+                        styleAttr="Horizontal" 
+                        style={styles.rbLoadingBar}
+                        
+                        />}
+                </ScrollView>
             </View>
         </View>
     );

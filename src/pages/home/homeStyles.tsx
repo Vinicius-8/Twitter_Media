@@ -55,6 +55,42 @@ export default StyleSheet.create({
         backgroundColor: "#292929",
         height: 410,
         width: 330,
-        borderRadius: 3
+        borderRadius: 3,
+        justifyContent:'center',
+        alignItems:'center',
+        paddingTop: 5
+    },
+
+    rbUserBox:{
+        backgroundColor: '#333',
+        marginBottom: 5,
+        width: 300,
+        height: 70,        
+        borderRadius: 2,
+        flexDirection: 'row',
+        alignItems:'center'
+    },
+    rbImage:{
+        height: 55,
+        width: 55, 
+        borderRadius: 4       ,
+        marginRight: 15,
+        marginLeft: 10
+    },
+    rbTextBox:{        
+        marginBottom: 15
+    },
+    rbName:{
+        fontSize: 17,
+        color:'#ccc'
+    },
+    rbScreenName:{
+        fontSize: 14,
+        color:'#ccc'
+    },
+    rbLoadingBar: {
+        marginTop: 150,
+        color:'#8888ff'
     }
+    
 });
