@@ -5,6 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack'
 
 
 import Home from './pages/home'
+import User from './pages/user'
 
 const AppStack = createStackNavigator();
 
@@ -15,7 +16,8 @@ const Routes = () => {
             <AppStack.Navigator 
                 initialRouteName="Home"
                 screenOptions={{ gestureEnabled: false }}>
-                <AppStack.Screen name="Home" component={Home}  options={{ headerShown: false }}/>                                
+                <AppStack.Screen name="Home" component={Home}  options={{ headerShown: false }}/>
+                <AppStack.Screen name="User" component={User}  options={{ headerShown: false }}/>                                
             </AppStack.Navigator>
         
         </NavigationContainer>
