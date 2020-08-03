@@ -19,7 +19,8 @@ interface User {
 
 const Home = () =>{
     const [username, setUsername] = useState('')
-    const [users, setUsers] = useState<User[]>([])
+    const [lastUsername, setLastUsername] = useState('')
+    const [users, setUsers] = useState<User[]>([])    
     const [loadingUsers, setLoadingUsers] = useState(false)
     const { twitter } = useTwitter();
     const navigation = useNavigation()
@@ -31,12 +32,14 @@ const Home = () =>{
     },[])
     
     function searchUsers(){
-        if(username===''){
-            setLoadingUsers(false)    
+        if(username==='' || username === lastUsername){
+            setLoadingUsers(false)                
             return
         }
+        
+        setLastUsername(username)
         Keyboard.dismiss()
-        setLoadingUsers(true)
+        setLoadingUsers(true)        
         twitter.get('users/search.json', {q:username,  count: maxResults})
         .then(resp =>{
             setUsers(resp)   
@@ -46,7 +49,7 @@ const Home = () =>{
 
     function userTouched(user: User){
         console.log('voce tocou no usuario: ', user.screen_name);
-        navigation.navigate('User', {screen_name: user.screen_name})
+        navigation.navigate('User', {user:user})
     }
 
     return(

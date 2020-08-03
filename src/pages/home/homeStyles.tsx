@@ -52,28 +52,30 @@ export default StyleSheet.create({
     },
 
     responseBox: {
-        backgroundColor: "#292929",
-        height: 410,
+        backgroundColor: "#292929",        
         width: 330,
+        height: 425,
         borderRadius: 3,
         justifyContent:'center',
         alignItems:'center',
-        paddingTop: 5
+        paddingTop: 1
     },
 
     rbUserBox:{
-        backgroundColor: '#333',
-        marginBottom: 5,
-        width: 300,
+        /*backgroundColor: '#333',*/        
+        marginBottom: 1,
+        width: 330,
         height: 70,        
         borderRadius: 2,
         flexDirection: 'row',
-        alignItems:'center'
+        alignItems:'center',
+        borderBottomColor: "#323232",
+        borderBottomWidth: 1
     },
     rbImage:{
-        height: 55,
-        width: 55, 
-        borderRadius: 4       ,
+        height: 58,
+        width: 58, 
+        borderRadius: 40       ,
         marginRight: 15,
         marginLeft: 10
     },
