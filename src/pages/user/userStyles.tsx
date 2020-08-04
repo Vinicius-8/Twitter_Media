@@ -6,7 +6,7 @@ export default StyleSheet.create({
     container: {
         flex: 1,     
         backgroundColor:'#292929',             
-        paddingTop: Constants.statusBarHeight + 10,              
+        
     },
 
     headerBox:{                             
@@ -14,6 +14,7 @@ export default StyleSheet.create({
         minHeight: 180,        
         flexDirection: 'column',    
         alignSelf:'center'    ,
+               
         
     },
     hbImage:{
@@ -58,7 +59,28 @@ export default StyleSheet.create({
         width: '95%',
     },
     galleryBox:{
+        borderTopWidth: .2, 
+        borderTopColor: "#555",
+        marginTop: 15,
+        alignItems:'center',
+        paddingTop: 60
+    },
+    galleryGridBox:{
+        width: '100%',        
+        
+        flex: 1, 
+        flexDirection: 'row', 
+        flexWrap: 'wrap'     ,
+        
+    },
 
+    gridItem:{
+        width: 118,
+        height: 118,
+        backgroundColor: 'grey',
+        /*marginRight: 10      ,*/
+        marginBottom: 2,
+        marginHorizontal: 1         
     }
 
 })

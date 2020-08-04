@@ -84,7 +84,8 @@ export default StyleSheet.create({
     },
     rbName:{
         fontSize: 17,
-        color:'#ccc'
+        color:'#ccc',
+        width: 250
     },
     rbScreenName:{
         fontSize: 14,

@@ -49,7 +49,7 @@ const Home = () =>{
 
     function userTouched(user: User){
         console.log('voce tocou no usuario: ', user.screen_name);
-        navigation.navigate('User', {user:user})
+        navigation.navigate('User', {user:user, twitter: twitter})
     }
 
     return(
@@ -81,7 +81,7 @@ const Home = () =>{
                     >
                         <Image source={{uri: user.profile_image_url}}  style={styles.rbImage}/>
                        <View style={styles.rbTextBox}>
-                            <Text style={styles.rbName}>{user.name}</Text>
+                            <Text style={styles.rbName} numberOfLines={1}>{user.name}</Text>
                             <Text style={styles.rbScreenName}>@{user.screen_name}</Text>
                        </View>
                     </TouchableOpacity>

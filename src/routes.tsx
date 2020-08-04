@@ -17,7 +17,7 @@ const Routes = () => {
                 initialRouteName="Home"
                 screenOptions={{ gestureEnabled: false }}>
                 <AppStack.Screen name="Home" component={Home}  options={{ headerShown: false }}/>
-                <AppStack.Screen name="User" component={User}  options={{ headerShown: false }}/>                                
+                <AppStack.Screen name="User" component={User}  options={{ headerShown: true }}/>                                
             </AppStack.Navigator>
         
         </NavigationContainer>
