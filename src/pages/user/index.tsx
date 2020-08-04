@@ -21,24 +21,32 @@ interface Tweet{
         media:[Media];
     }
     extended_entities:{
-        media:[Media];
+        media:[Media];        
     }
 }
 
+interface Video{
+    bitrate: number
+    content_type: string
+    url: string
+}
+
 interface Media{
-     id: number 
-     media_url: string 
+    id: number 
+    media_url: string
+    type: string
+    video_info:{
+        variants: [Video]
+    }    
 }
 
 const User = (props: any) =>{    
     const user:User = props.route.params.user;   
     user.profile_image_url = increaseProfilePicQuality(user.profile_image_url)       ;
     const navigation = useNavigation();
-    const { twitter } = useTwitter();
-
-    const [tweets, setTweets] = useState<Tweet[]>([])
+    const { twitter } = useTwitter();    
     const [medias, setMedias] = useState< Media[]> ([])
-
+    const TWEETS_COUNT = 15
     
 
     navigation.setOptions({
@@ -61,15 +69,36 @@ const User = (props: any) =>{
         let medias:Media[] = [];        
         for (let index = 0; index < tweets.length; index++) {                        
             if (tweets[index].extended_entities !== undefined){                                
-                for (let j = 0; j <  tweets[index].extended_entities.media.length; j++) {
-                    medias.push({
-                        id: tweets[index].extended_entities.media[j].id,
-                        media_url: tweets[index].extended_entities.media[j].media_url})                                        
+                for (let j = 0; j <  tweets[index].extended_entities.media.length; j++) {                                                            
+                    if(tweets[index].extended_entities.media[j].type === "photo"){
+                        medias.push({
+                            id: tweets[index].extended_entities.media[j].id,
+                            media_url: tweets[index].extended_entities.media[j].media_url,
+                            type: tweets[index].extended_entities.media[j].type,
+                            video_info:{
+                                variants: [{   bitrate: 0, content_type: "", url: "" }]}
+                            })
+
+                    }else if(tweets[index].extended_entities.media[j].type === "video"){
+                        let len = tweets[index].extended_entities.media[j].video_info.variants.length;                        
+                            medias.push({
+                                id: tweets[index].extended_entities.media[j].id,
+                                media_url: tweets[index].extended_entities.media[j].media_url,
+                                type: tweets[index].extended_entities.media[j].type,
+                                video_info:{
+                                    variants: [{
+                                        bitrate: tweets[index].extended_entities.media[j].video_info.variants[len-1].bitrate, 
+                                        content_type: tweets[index].extended_entities.media[j].video_info.variants[len-1].content_type, 
+                                        url: tweets[index].extended_entities.media[j].video_info.variants[len-1].url
+                                    }]
+                                }
+                           })                                
+                        }                        
+                           
+                    }                                     
                 }                
-            }
-            
-            
-        }        
+            }                    
+                
         return medias        
     }
 
@@ -77,9 +106,8 @@ const User = (props: any) =>{
         twitter.setConsumerKey(Credentials.apiKey, Credentials.apiSecretKey);
         twitter.setAccessToken(Credentials.accessToken, Credentials.accessTokenSecret);                    
         
-        twitter.get('statuses/user_timeline.json', {screen_name: user.screen_name, count: 10,})
-        .then(resp=>{
-                                    
+        twitter.get('statuses/user_timeline.json', {screen_name: user.screen_name, count: TWEETS_COUNT,})
+        .then(resp=>{                                    
             setMedias(filterMediaInTweets(resp))
         })       
     },[])    

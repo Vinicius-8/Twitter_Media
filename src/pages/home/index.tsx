@@ -47,9 +47,8 @@ const Home = () =>{
         })
     }
 
-    function userTouched(user: User){
-        console.log('voce tocou no usuario: ', user.screen_name);
-        navigation.navigate('User', {user:user, twitter: twitter})
+    function userTouched(user: User){        
+        navigation.navigate('User', {user:user})
     }
 
     return(
