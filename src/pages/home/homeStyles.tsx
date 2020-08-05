@@ -11,7 +11,7 @@ export default StyleSheet.create({
     },    
 
     inputBox: {
-        backgroundColor: "#292929",
+        backgroundColor: "#292929",        
         height: 160,
         width: 330,
         borderRadius: 3,

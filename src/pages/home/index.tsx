@@ -44,7 +44,7 @@ const Home = () =>{
         .then(resp =>{
             setUsers(resp)   
             setLoadingUsers(false)         
-        })
+        })                
     }
 
     function userTouched(user: User){        

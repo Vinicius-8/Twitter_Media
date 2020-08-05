@@ -1,8 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import {View, Text, Image, ScrollView,} from 'react-native'
+import {View, Text, Image, ScrollView, TouchableOpacity} from 'react-native'
 
 import { useTwitter } from "react-native-simple-twitter";
 import { useNavigation } from '@react-navigation/native';
+import { Fontisto } from '@expo/vector-icons'; 
+
 import styles from './userStyles'
 import Credentials from '../../credentials'
 
@@ -46,6 +48,7 @@ const User = (props: any) =>{
     const navigation = useNavigation();
     const { twitter } = useTwitter();    
     const [medias, setMedias] = useState< Media[]> ([])
+    const [exhibitionMode, setExhibitionMode] = useState('grid')
     const TWEETS_COUNT = 15
     
 
@@ -93,8 +96,7 @@ const User = (props: any) =>{
                                     }]
                                 }
                            })                                
-                        }                        
-                           
+                        }                                                   
                     }                                     
                 }                
             }                    
@@ -136,14 +138,46 @@ const User = (props: any) =>{
                     </View>
                 </View>
                 <View style={styles.galleryBox}>
-                    <View style={styles.galleryGridBox}>                        
-                        {medias.map(url=>(
-                            <Image key={url.id}
-                            style={styles.gridItem} 
-                            source={{uri: url.media_url}} />
-                        ))}
-                        
+                    <View style={styles.exhibitionType}>
+                        <TouchableOpacity style={styles.exhibitionBox}
+                            onPress={()=>setExhibitionMode("grid")}
+                        >
+                            <Fontisto name="nav-icon-grid-a" size={24} color="#ccc"/>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.exhibitionBox}
+                            onPress={()=>setExhibitionMode("list")}
+                        >
+                            <Fontisto name="fog" size={24} color="#ccc"/>
+                        </TouchableOpacity>
+                    
                     </View>
+                    { exhibitionMode === "grid" ?
+                        <View style={styles.galleryGridBox}>                        
+                            {medias.map(url=>(
+                                <TouchableOpacity  key={url.id}>
+                                    <Image
+                                    style={styles.gridItem} 
+                                    source={{uri: url.media_url}} />
+                                </TouchableOpacity>
+                            ))}                        
+                        </View> 
+                    :
+
+                        <View style={styles.galleryListBox}>
+                            {medias.map(url=>(
+                                 <TouchableOpacity  
+                                    key={url.id}
+                                    activeOpacity={1}
+                                 >
+                                    <Image 
+                                    style={styles.listItem} 
+                                    source={{uri: url.media_url}}                                 
+                                    />
+                                </TouchableOpacity>
+                            ))}   
+                        </View>
+                    
+                    }
 
                 </View>
             </ScrollView>                                  
