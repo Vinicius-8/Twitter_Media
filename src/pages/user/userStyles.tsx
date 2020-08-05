@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native'
-import Constants from 'expo-constants' 
 
 
 export default StyleSheet.create({
@@ -8,6 +7,21 @@ export default StyleSheet.create({
         backgroundColor:'#292929',             
         
     },
+
+    modalContainer:{
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center',
+        backgroundColor: 'rgba(0,0,0, 0.7)',
+    },
+    modalBox:{
+        width: 300,
+        height: 180,
+        borderRadius: 5,
+        backgroundColor:'#6A7291',
+        justifyContent:'space-around'   
+    }
+    ,
 
     headerBox:{                             
         width: '94%',

@@ -1,12 +1,14 @@
 import React, {useState, useEffect} from 'react'
-import {View, Text, Image, ScrollView, TouchableOpacity} from 'react-native'
+import {View, Text, Image, ScrollView, TouchableOpacity, Modal, TouchableWithoutFeedback} from 'react-native'
 
 import { useTwitter } from "react-native-simple-twitter";
 import { useNavigation } from '@react-navigation/native';
+import ImageViewer from 'react-native-image-zoom-viewer';
 import { Fontisto } from '@expo/vector-icons'; 
 
 import styles from './userStyles'
 import Credentials from '../../credentials'
+
 
 interface User {
     id: string
@@ -42,6 +44,10 @@ interface Media{
     }    
 }
 
+interface ImagesCarousel{
+    url: string
+}
+
 const User = (props: any) =>{    
     const user:User = props.route.params.user;   
     user.profile_image_url = increaseProfilePicQuality(user.profile_image_url)       ;
@@ -49,8 +55,12 @@ const User = (props: any) =>{
     const { twitter } = useTwitter();    
     const [medias, setMedias] = useState< Media[]> ([])
     const [exhibitionMode, setExhibitionMode] = useState('grid')
+    const [isModalVisible, setIsModalVisible] = useState(false)
     const TWEETS_COUNT = 15
     
+    const [imagesCarousel, setImagesCarousel] = useState< ImagesCarousel[]>([])
+    const [indexCarousel, setIndexCarousel] = useState(0)
+
 
     navigation.setOptions({
         title: user.screen_name,
@@ -104,7 +114,24 @@ const User = (props: any) =>{
         return medias        
     }
 
+    function touchImage(media: Media){
+        let index = medias.indexOf(media)
+        setIndexCarousel(index)
+        setIsModalVisible(true)
+    }
+
+    useEffect(()=>{
+        let r = medias.map(item =>{
+            return {url:item.media_url}
+        })
+
+        setImagesCarousel(r)
+        
+    }, [medias])
+
     useEffect(()=>{    
+        console.log('dadosPresentes: ', medias);
+        
         twitter.setConsumerKey(Credentials.apiKey, Credentials.apiSecretKey);
         twitter.setAccessToken(Credentials.accessToken, Credentials.accessTokenSecret);                    
         
@@ -116,6 +143,48 @@ const User = (props: any) =>{
     
     return(
         <View style={styles.container}>
+            {/*<Modal
+                animationType='fade' 
+                transparent={true} 
+                visible={isModalVisible} >
+                    <TouchableWithoutFeedback
+                        onPress={()=>setIsModalVisible(false)}
+                    >
+                        <View style={styles.modalContainer}>
+                            <TouchableWithoutFeedback>  
+                                <View style={styles.modalBox} >
+
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </View>
+
+                    </TouchableWithoutFeedback>
+            </Modal>*/}
+            <Modal 
+                visible={isModalVisible} transparent={true}
+                onRequestClose={()=>{setIsModalVisible(false)}
+                }
+                >                                                                   
+                            <ImageViewer 
+                            flipThreshold={8}
+                            enableSwipeDown={true}                            
+                            backgroundColor={'rgba(0,0,0, 0.7)'}                            
+                            onSwipeDown={()=>setIsModalVisible(false)}  
+                            index={indexCarousel}                  
+                            failImageSource={{url: "https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-delete-icon.png"}}
+                            renderIndicator={
+                                (currentIndex, allSize) => {
+                                return <View></View>
+                              }}
+                            imageUrls={imagesCarousel}
+                            renderFooter={
+                                ()=> <Text style={{color: "white"}}>---</Text>
+                            }
+                            />                        
+                        
+                </Modal>
+
+
             <ScrollView>
                 <View style={styles.headerBox}>
                     <View style={{flexDirection:'row'}}>
@@ -153,25 +222,28 @@ const User = (props: any) =>{
                     </View>
                     { exhibitionMode === "grid" ?
                         <View style={styles.galleryGridBox}>                        
-                            {medias.map(url=>(
-                                <TouchableOpacity  key={url.id}>
+                            {medias.map(media=>(
+                                <TouchableOpacity  key={media.id}                                    
+                                    onPress={()=>{touchImage(media)}}
+                                >
                                     <Image
                                     style={styles.gridItem} 
-                                    source={{uri: url.media_url}} />
+                                    source={{uri: media.media_url}}/>
                                 </TouchableOpacity>
                             ))}                        
                         </View> 
                     :
 
                         <View style={styles.galleryListBox}>
-                            {medias.map(url=>(
+                            {medias.map(media=>(
                                  <TouchableOpacity  
-                                    key={url.id}
+                                    key={media.id}
                                     activeOpacity={1}
+                                    onPress={()=>{touchImage(media)}}
                                  >
                                     <Image 
                                     style={styles.listItem} 
-                                    source={{uri: url.media_url}}                                 
+                                    source={{uri: media.media_url}}                                 
                                     />
                                 </TouchableOpacity>
                             ))}   
