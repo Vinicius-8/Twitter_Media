@@ -5,9 +5,12 @@ import { useTwitter } from "react-native-simple-twitter";
 import { useNavigation } from '@react-navigation/native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { Fontisto, Entypo } from '@expo/vector-icons'; 
-
 import styles from './userStyles'
 import Credentials from '../../credentials'
+
+import { Video as VVideo } from 'expo-av'
+import VideoPlayer from 'expo-video-player'
+
 
 
 interface User {
@@ -55,13 +58,14 @@ const User = (props: any) =>{
     const { twitter } = useTwitter();    
     const [medias, setMedias] = useState< Media[]> ([])
     const [exhibitionMode, setExhibitionMode] = useState('grid')
-    const [isModalVisible, setIsModalVisible] = useState(false)
-    const TWEETS_COUNT = 50
-    
+    const [isModalCarouselVisible, setIsModalCarouselVisible] = useState(false)
+    const [isModalVideoVisible, setIsModalVideoVisible] = useState(false);
+    const [currentVideo, setCurrentVideo] = useState('')
+    const TWEETS_COUNT = 50    
     const [imagesCarousel, setImagesCarousel] = useState< ImagesCarousel[]>([])
     const [indexCarousel, setIndexCarousel] = useState(0)
 
-
+        
     navigation.setOptions({
         title: user.screen_name,
         headerTintColor: '#ddd',
@@ -118,9 +122,10 @@ const User = (props: any) =>{
         if(media.type === "photo"){
             let index = medias.indexOf(media)
             setIndexCarousel(index)
-            setIsModalVisible(true)
+            setIsModalCarouselVisible(true)
         }else if(media.type === "video"){
-            console.log('Abrindo video...');            
+            setCurrentVideo(media.video_info.variants[0].url)
+            setIsModalVideoVisible(true)            
         }
     }
 
@@ -148,9 +153,9 @@ const User = (props: any) =>{
             {/*<Modal
                 animationType='fade' 
                 transparent={true} 
-                visible={isModalVisible} >
+                visible={isModalCarouselVisible} >
                     <TouchableWithoutFeedback
-                        onPress={()=>setIsModalVisible(false)}
+                        onPress={()=>setIsModalCarouselVisible(false)}
                     >
                         <View style={styles.modalContainer}>
                             <TouchableWithoutFeedback>  
@@ -163,15 +168,15 @@ const User = (props: any) =>{
                     </TouchableWithoutFeedback>
             </Modal>*/}
             <Modal 
-                visible={isModalVisible} transparent={true}
-                onRequestClose={()=>{setIsModalVisible(false)}
+                visible={isModalCarouselVisible} transparent={true}
+                onRequestClose={()=>{setIsModalCarouselVisible(false)}
                 }
                 >                                                                   
                             <ImageViewer 
                                 flipThreshold={8}
                                 enableSwipeDown={true}                            
                                 backgroundColor={'rgba(0,0,0, 0.7)'}                            
-                                onSwipeDown={()=>setIsModalVisible(false)}  
+                                onSwipeDown={()=>setIsModalCarouselVisible(false)}  
                                 index={indexCarousel}                  
                                 failImageSource={{url: "https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-delete-icon.png"}}
                                 renderIndicator={
@@ -184,8 +189,27 @@ const User = (props: any) =>{
                                 }
                             />                        
                         
-                </Modal>
+                            </Modal>
 
+            <Modal visible={isModalVideoVisible} transparent={true}
+            onRequestClose={()=>{setIsModalVideoVisible(false)}} >
+
+            <VideoPlayer   
+                disableSlider={true}
+                showFullscreenButton={false}
+                videoProps={{                    
+                    shouldPlay: true,
+                    isLooping: true,                    
+                    resizeMode: VVideo.RESIZE_MODE_CONTAIN,
+                    source: {
+                    uri: currentVideo,
+                    },                    
+                }}
+                
+                inFullscreen={true}
+                videoBackground={"rgba(0,0,0,0.8)"}                
+                />
+            </Modal>                                
 
             <ScrollView>
                 <View style={styles.headerBox}>
