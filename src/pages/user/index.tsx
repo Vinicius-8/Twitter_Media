@@ -4,7 +4,7 @@ import {View, Text, Image, ScrollView, TouchableOpacity, Modal, TouchableWithout
 import { useTwitter } from "react-native-simple-twitter";
 import { useNavigation } from '@react-navigation/native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import { Fontisto } from '@expo/vector-icons'; 
+import { Fontisto, Entypo } from '@expo/vector-icons'; 
 
 import styles from './userStyles'
 import Credentials from '../../credentials'
@@ -56,7 +56,7 @@ const User = (props: any) =>{
     const [medias, setMedias] = useState< Media[]> ([])
     const [exhibitionMode, setExhibitionMode] = useState('grid')
     const [isModalVisible, setIsModalVisible] = useState(false)
-    const TWEETS_COUNT = 15
+    const TWEETS_COUNT = 50
     
     const [imagesCarousel, setImagesCarousel] = useState< ImagesCarousel[]>([])
     const [indexCarousel, setIndexCarousel] = useState(0)
@@ -114,10 +114,14 @@ const User = (props: any) =>{
         return medias        
     }
 
-    function touchImage(media: Media){
-        let index = medias.indexOf(media)
-        setIndexCarousel(index)
-        setIsModalVisible(true)
+    function touchMedia(media: Media){
+        if(media.type === "photo"){
+            let index = medias.indexOf(media)
+            setIndexCarousel(index)
+            setIsModalVisible(true)
+        }else if(media.type === "video"){
+            console.log('Abrindo video...');            
+        }
     }
 
     useEffect(()=>{
@@ -129,9 +133,7 @@ const User = (props: any) =>{
         
     }, [medias])
 
-    useEffect(()=>{    
-        console.log('dadosPresentes: ', medias);
-        
+    useEffect(()=>{                
         twitter.setConsumerKey(Credentials.apiKey, Credentials.apiSecretKey);
         twitter.setAccessToken(Credentials.accessToken, Credentials.accessTokenSecret);                    
         
@@ -166,20 +168,20 @@ const User = (props: any) =>{
                 }
                 >                                                                   
                             <ImageViewer 
-                            flipThreshold={8}
-                            enableSwipeDown={true}                            
-                            backgroundColor={'rgba(0,0,0, 0.7)'}                            
-                            onSwipeDown={()=>setIsModalVisible(false)}  
-                            index={indexCarousel}                  
-                            failImageSource={{url: "https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-delete-icon.png"}}
-                            renderIndicator={
-                                (currentIndex, allSize) => {
-                                return <View></View>
-                              }}
-                            imageUrls={imagesCarousel}
-                            renderFooter={
-                                ()=> <Text style={{color: "white"}}>---</Text>
-                            }
+                                flipThreshold={8}
+                                enableSwipeDown={true}                            
+                                backgroundColor={'rgba(0,0,0, 0.7)'}                            
+                                onSwipeDown={()=>setIsModalVisible(false)}  
+                                index={indexCarousel}                  
+                                failImageSource={{url: "https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-delete-icon.png"}}
+                                renderIndicator={
+                                    (currentIndex, allSize) => {
+                                    return <View></View>
+                                }}
+                                imageUrls={imagesCarousel}
+                                renderFooter={
+                                    ()=> <Text style={{color: "white"}}>---</Text>
+                                }
                             />                        
                         
                 </Modal>
@@ -224,11 +226,15 @@ const User = (props: any) =>{
                         <View style={styles.galleryGridBox}>                        
                             {medias.map(media=>(
                                 <TouchableOpacity  key={media.id}                                    
-                                    onPress={()=>{touchImage(media)}}
+                                    onPress={()=>{touchMedia(media)}}
                                 >
+                                    <View style={styles.gbPlayBox} >
+                                        {media.type==="video" ? <Entypo name="controller-play" size={24} style={styles.gbPlay}/> : null}
+                                    </View>
                                     <Image
                                     style={styles.gridItem} 
                                     source={{uri: media.media_url}}/>
+                                    
                                 </TouchableOpacity>
                             ))}                        
                         </View> 
@@ -239,8 +245,11 @@ const User = (props: any) =>{
                                  <TouchableOpacity  
                                     key={media.id}
                                     activeOpacity={1}
-                                    onPress={()=>{touchImage(media)}}
+                                    onPress={()=>{touchMedia(media)}}
                                  >
+                                     <View style={styles.gbPlayBox} >
+                                        {media.type==="video" ? <Entypo name="video-camera" size={25} style={[styles.gbPlay, {marginLeft: 10, marginTop: 8}]}/> : null}
+                                    </View>
                                     <Image 
                                     style={styles.listItem} 
                                     source={{uri: media.media_url}}                                 

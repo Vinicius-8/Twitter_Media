@@ -99,7 +99,13 @@ export default StyleSheet.create({
         flexWrap: 'wrap'     ,
         
     },
-
+    gbPlayBox:{
+        position:'absolute',
+        zIndex: 9,        
+    },
+    gbPlay:{
+        color: 'rgba(255,255,255,.9)',        
+    },
     gridItem:{
         width: 118,
         height: 118,
