@@ -1,17 +1,18 @@
 import React, {useState, useEffect} from 'react'
-import {View, Text, Image, ScrollView, TouchableOpacity, Modal, TouchableWithoutFeedback} from 'react-native'
+import {View, Text, Image, ScrollView, TouchableOpacity, Modal, Alert, ToastAndroid} from 'react-native'
 
 import { useTwitter } from "react-native-simple-twitter";
 import { useNavigation } from '@react-navigation/native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import { Fontisto, Entypo } from '@expo/vector-icons'; 
+import { Fontisto, Entypo, AntDesign } from '@expo/vector-icons'; 
 import styles from './userStyles'
 import Credentials from '../../credentials'
 
 import { Video as VVideo } from 'expo-av'
 import VideoPlayer from 'expo-video-player'
-
-
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import * as Permissions from 'expo-permissions';
 
 interface User {
     id: string
@@ -64,7 +65,8 @@ const User = (props: any) =>{
     const TWEETS_COUNT = 50    
     const [imagesCarousel, setImagesCarousel] = useState< ImagesCarousel[]>([])
     const [indexCarousel, setIndexCarousel] = useState(0)
-
+    const [fixExhibitionView, setFixExhibitionView] = useState(false)
+    
         
     navigation.setOptions({
         title: user.screen_name,
@@ -128,6 +130,29 @@ const User = (props: any) =>{
             setIsModalVideoVisible(true)            
         }
     }
+    
+    async function saveMediaInGallery(url: string, type: string){    
+        
+        const permission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+        if (permission.status === 'granted') {
+            ToastAndroid.show("Downloading...", ToastAndroid.SHORT)
+            let fileName = url.slice(url.lastIndexOf('/'), url.lastIndexOf('.'))
+            FileSystem.downloadAsync(
+                url,
+                FileSystem.cacheDirectory + fileName +"."+ type
+            )
+                .then(({ uri }) => {
+                    console.log('Finished downloading to ', uri);
+                    MediaLibrary.saveToLibraryAsync(uri);                    
+                    ToastAndroid.show("Media saved to this device", ToastAndroid.SHORT)                    
+                })
+                .catch(error => {
+                    console.error(error);   
+                });      
+        }else{
+            Alert.alert("Fail", "Media cannot be saved")
+        }      
+    }
 
     useEffect(()=>{
         let r = medias.map(item =>{
@@ -149,24 +174,7 @@ const User = (props: any) =>{
     },[])    
     
     return(
-        <View style={styles.container}>
-            {/*<Modal
-                animationType='fade' 
-                transparent={true} 
-                visible={isModalCarouselVisible} >
-                    <TouchableWithoutFeedback
-                        onPress={()=>setIsModalCarouselVisible(false)}
-                    >
-                        <View style={styles.modalContainer}>
-                            <TouchableWithoutFeedback>  
-                                <View style={styles.modalBox} >
-
-                                </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-
-                    </TouchableWithoutFeedback>
-            </Modal>*/}
+        <View style={styles.container}>            
             <Modal 
                 visible={isModalCarouselVisible} transparent={true}
                 onRequestClose={()=>{setIsModalCarouselVisible(false)}
@@ -185,15 +193,16 @@ const User = (props: any) =>{
                                 }}
                                 imageUrls={imagesCarousel}
                                 renderFooter={
-                                    ()=> <Text style={{color: "white"}}>---</Text>
+                                    (currentIndex)=> <AntDesign name="download" size={24} style={styles.downloadButton} onPress={() => saveMediaInGallery(imagesCarousel[currentIndex].url, 'jpg')}/>
                                 }
                             />                        
                         
                             </Modal>
 
             <Modal visible={isModalVideoVisible} transparent={true}
-            onRequestClose={()=>{setIsModalVideoVisible(false)}} >
-
+            onRequestClose={()=>{setIsModalVideoVisible(false)}} >            
+            <View style={{position:'absolute'}}>
+            <AntDesign name="download" size={24} style={ styles.downloadButtonVideo} onPress={() => saveMediaInGallery(currentVideo, 'mp4')}/>                    
             <VideoPlayer   
                 disableSlider={true}
                 showFullscreenButton={false}
@@ -204,12 +213,27 @@ const User = (props: any) =>{
                     source: {
                     uri: currentVideo,
                     },                    
-                }}
-                
+                }}                
                 inFullscreen={true}
                 videoBackground={"rgba(0,0,0,0.8)"}                
                 />
+            
+            </View>
             </Modal>                                
+                { fixExhibitionView ?
+            <View style={styles.exhibitionType}>
+                        <TouchableOpacity style={styles.exhibitionBox}
+                            onPress={()=>setExhibitionMode("grid")}
+                        >
+                            <Fontisto name="nav-icon-grid-a" size={24} color="#ccc"/>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.exhibitionBox}
+                            onPress={()=>setExhibitionMode("list")}
+                        >
+                            <Fontisto name="fog" size={24} color="#ccc"/>
+                        </TouchableOpacity>
+                    
+            </View>: null}
 
             <ScrollView>
                 <View style={styles.headerBox}>
@@ -231,25 +255,27 @@ const User = (props: any) =>{
                         <Text style={styles.tbScreenName}>@{user.screen_name}</Text>
                         <Text style={styles.tbDescription}>{user.description}</Text>
                     </View>
-                </View>
-                <View style={styles.galleryBox}>
-                    <View style={styles.exhibitionType}>
-                        <TouchableOpacity style={styles.exhibitionBox}
-                            onPress={()=>setExhibitionMode("grid")}
-                        >
-                            <Fontisto name="nav-icon-grid-a" size={24} color="#ccc"/>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.exhibitionBox}
-                            onPress={()=>setExhibitionMode("list")}
-                        >
-                            <Fontisto name="fog" size={24} color="#ccc"/>
-                        </TouchableOpacity>
-                    
-                    </View>
+                </View>                
+                <View style={styles.galleryBox}>    
+
+                        <View style={styles.exhibitionType}>
+                            <TouchableOpacity style={styles.exhibitionBox}
+                                onPress={()=>setExhibitionMode("grid")}
+                            >
+                                <Fontisto name="nav-icon-grid-a" size={24} color="#ccc"/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.exhibitionBox}
+                                onPress={()=>setExhibitionMode("list")}
+                            >
+                                <Fontisto name="fog" size={24} color="#ccc"/>
+                            </TouchableOpacity>                    
+                        </View>        
+
+
                     { exhibitionMode === "grid" ?
                         <View style={styles.galleryGridBox}>                        
-                            {medias.map(media=>(
-                                <TouchableOpacity  key={media.id}                                    
+                            {medias.map((media, index)=>(
+                                <TouchableOpacity  key={index}                                    
                                     onPress={()=>{touchMedia(media)}}
                                 >
                                     <View style={styles.gbPlayBox} >
@@ -265,9 +291,9 @@ const User = (props: any) =>{
                     :
 
                         <View style={styles.galleryListBox}>
-                            {medias.map(media=>(
+                            {medias.map((media, index)=>(
                                  <TouchableOpacity  
-                                    key={media.id}
+                                    key={index}
                                     activeOpacity={1}
                                     onPress={()=>{touchMedia(media)}}
                                  >

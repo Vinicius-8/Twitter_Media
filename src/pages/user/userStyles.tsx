@@ -92,6 +92,18 @@ export default StyleSheet.create({
         marginTop: 15,
         alignItems:'center',        
     },
+    downloadButton:{
+        color: "snow",
+        marginLeft: 15,
+        marginBottom: 12
+    },
+    downloadButtonVideo:{
+        position:'absolute',
+        zIndex: 2,
+        color: "snow",        
+        bottom: 40,
+        left: 20
+    },
     galleryGridBox:{
         width: '100%',                
         flex: 1, 

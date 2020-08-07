@@ -62,6 +62,8 @@ const Home = () =>{
                 placeholderTextColor={"#444"}           
                 style={styles.ibInput}
                 onChangeText={(text: string)=> setUsername(text)}                   
+                onSubmitEditing={searchUsers}
+                returnKeyType="search"
                 />
 
                 <TouchableOpacity style={styles.ibButton}
