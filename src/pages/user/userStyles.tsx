@@ -115,9 +115,15 @@ export default StyleSheet.create({
         position:'absolute',
         zIndex: 9,        
     },
-    gbPlay:{
-        color: 'rgba(255,255,255,.9)',        
+    gbBigPlayBox:{
+        position:'absolute',
+        zIndex: 2,        
+        paddingLeft: "53%",
+        paddingTop: "53%"
     },
+    gbPlay:{
+        color: 'rgba(255,255,255,.7)',        
+    },    
     gridItem:{
         width: 118,
         height: 118,

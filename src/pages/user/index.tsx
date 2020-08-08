@@ -297,8 +297,10 @@ const User = (props: any) =>{
                                     activeOpacity={1}
                                     onPress={()=>{touchMedia(media)}}
                                  >
-                                     <View style={styles.gbPlayBox} >
-                                        {media.type==="video" ? <Entypo name="video-camera" size={25} style={[styles.gbPlay, {marginLeft: 10, marginTop: 8}]}/> : null}
+                                     <View style={styles.gbBigPlayBox} >
+                                        
+                                        {media.type==="video" ? <Entypo name="controller-play" size={80} style={styles.gbPlay}/> : null}
+                                        
                                     </View>
                                     <Image 
                                     style={styles.listItem} 
