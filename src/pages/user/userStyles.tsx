@@ -40,7 +40,7 @@ export default StyleSheet.create({
         flexDirection: 'row',        
         width: 180,
         alignItems:'center',
-        justifyContent:'center'
+        justifyContent:'center',    
     },
     nbFollowing:{
         marginRight: 20,
@@ -68,7 +68,7 @@ export default StyleSheet.create({
     tbDescription:{
         marginTop: 10,
         color:"#ddd",
-        width: '95%',
+        width: '95%',    
     },
 
     exhibitionType:{        
@@ -85,6 +85,23 @@ export default StyleSheet.create({
         justifyContent:'space-evenly',
         alignItems:'center',  
            
+    },
+    filterBox:{        
+        width:'100%',
+        height: 44,
+        flexDirection:'row',        
+        alignItems:'center',                
+    },
+    filterItems:{                
+        width: 170,
+        height: 44,
+        justifyContent:'space-evenly',
+        alignItems:'center',          
+    },
+    filterItemsAtivated:{
+       color: "#0F0",
+       backgroundColor: 'rgba(0,255,0,.08)',
+       borderRadius: 100
     },
     galleryBox:{        
         borderTopWidth: .2, 
