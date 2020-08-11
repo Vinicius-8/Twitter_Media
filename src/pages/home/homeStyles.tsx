@@ -8,7 +8,25 @@ export default StyleSheet.create({
         backgroundColor:'#191919',
         alignItems: 'center',     
         paddingTop: Constants.statusBarHeight + 10,   
-    },    
+    },   
+    loadingContainer: {
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, .5)"
+
+    },
+
+    loadingModal:{        
+        width: 150,
+        height: 100,
+        backgroundColor:"rgba(136, 136, 255, .7)",
+        alignSelf:"center",
+        borderRadius: 2,
+        justifyContent: "space-evenly",
+        alignItems: "center",
+        paddingBottom: 15
+    },
 
     inputBox: {
         backgroundColor: "#292929",        

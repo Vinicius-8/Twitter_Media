@@ -64,7 +64,7 @@ const User = (props: any) =>{
     const [isModalCarouselVisible, setIsModalCarouselVisible] = useState(false)
     const [isModalVideoVisible, setIsModalVideoVisible] = useState(false);
     const [currentVideo, setCurrentVideo] = useState('')
-    const TWEETS_COUNT = 50    
+    const TWEETS_COUNT = 50   
     const [imagesCarousel, setImagesCarousel] = useState< ImagesCarousel[]>([])
     const [indexCarousel, setIndexCarousel] = useState(0)    
     const [excludeReplies, setExcludeReplies] = useState(false)
@@ -88,10 +88,10 @@ const User = (props: any) =>{
 
     function filterMediaInTweets(tweets: Tweet[]){
         let medias:Media[] = [];        
-        for (let index = 0; index < tweets.length; index++) {                        
+        for (let index = 0; index < tweets.length; index++) {                                  
             if (tweets[index].extended_entities !== undefined){                           
                 for (let j = 0; j <  tweets[index].extended_entities.media.length; j++) {                     
-                    if(tweets[index].extended_entities.media[j].type === "photo"){
+                    if(tweets[index].extended_entities.media[j].type === "photo"){                    
                         medias.push({
                             id: tweets[index].extended_entities.media[j].id,
                             media_url: tweets[index].extended_entities.media[j].media_url,
@@ -180,6 +180,7 @@ const User = (props: any) =>{
         })       
     },[includeRts, excludeReplies])
             
+
     const GalleryGridView = () =>(
         <View style={styles.galleryGridBox}>                        
             {medias.map((media, index)=>(
@@ -243,6 +244,7 @@ const User = (props: any) =>{
                     renderFooter={
                         (currentIndex)=> <AntDesign name="download" size={24} style={styles.downloadButton} onPress={() => saveMediaInGallery(imagesCarousel[currentIndex].url, 'jpg')}/>
                     }
+                    saveToLocalByLongPress={false}
                 />                        
             
             </Modal>

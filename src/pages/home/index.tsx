@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {Text, View, TouchableOpacity, TextInput, ScrollView, Image, ProgressBarAndroid, 
-    Keyboard} from 'react-native'
+    Keyboard, Clipboard, Modal} from 'react-native'
 
 import { useTwitter } from "react-native-simple-twitter";
 import { useNavigation } from '@react-navigation/native';
@@ -22,15 +22,44 @@ const Home = () =>{
     const [lastUsername, setLastUsername] = useState('')
     const [users, setUsers] = useState<User[]>([])    
     const [loadingUsers, setLoadingUsers] = useState(false)
+    const [loadingUser, setLoadingUser] = useState(false)
     const { twitter } = useTwitter();
     const navigation = useNavigation()
-    const maxResults = 20
+    const maxResults = 50
 
     useEffect(()=>{
         twitter.setConsumerKey(Credentials.apiKey, Credentials.apiSecretKey)
-        twitter.setAccessToken(Credentials.accessToken, Credentials.accessTokenSecret)         
+        twitter.setAccessToken(Credentials.accessToken, Credentials.accessTokenSecret) 
+        
+        loadData().then(username=>{
+            
+            if(username){                
+                setLoadingUser(true)
+                twitter.get('users/search.json', {q:username,  count: 1})
+                .then(resp =>{      
+                    setLoadingUser(false)              
+                    userTouched(resp[0])             
+                })    
+            }
+        })
     },[])
     
+    async function readFromClipboard(){
+        const clipboardContent = await Clipboard.getString();        
+        return clipboardContent.toString();
+    }
+
+
+
+    async function loadData(){
+        let clipboardData = await readFromClipboard()        ;
+        
+        let index1 = clipboardData.indexOf('twitter.com/') + 12;
+        let index2 = clipboardData.indexOf('?');
+        return clipboardData.slice(index1, index2);
+    }
+
+
     function searchUsers(){
         if(username==='' || username === lastUsername){
             setLoadingUsers(false)                
@@ -53,6 +82,22 @@ const Home = () =>{
 
     return(
         <View style={styles.container}>
+            <Modal 
+                visible={loadingUser} transparent={true}
+                animationType="fade"
+                onRequestClose={()=>{1+1}}
+                >
+                    <View style={styles.loadingContainer}>
+                        <View style={styles.loadingModal}>
+                            <Text> Loading user...</Text>
+                            <ProgressBarAndroid 
+                                styleAttr="Small" 
+                                color="black"                        
+                            />
+                        </View>
+                    </View>
+
+                </Modal> 
             <View style={styles.inputBox}>
                 <Text style={styles.ibTitle}>Search for a account: </Text>
                 <TextInput 
