@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react'
 import {View, Text, Image, ScrollView, TouchableOpacity, 
-    Modal, Alert, ToastAndroid,} from 'react-native'
+    Modal, Alert, ToastAndroid, ProgressBarAndroid,} from 'react-native'
 
 import { useTwitter } from "react-native-simple-twitter";
 import { useNavigation } from '@react-navigation/native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import { Fontisto, Entypo, AntDesign, EvilIcons } from '@expo/vector-icons'; 
+import { Fontisto, Entypo, AntDesign, EvilIcons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import styles from './userStyles'
 import Credentials from '../../credentials'
 
@@ -55,8 +55,9 @@ interface ImagesCarousel{
 }
 
 const User = (props: any) =>{    
-    const user:User = props.route.params.user;   
+    const user:User = props.route.params.user;           
     user.profile_image_url = increaseProfilePicQuality(user.profile_image_url)       ;
+    const protectedAccount = user.protected;
     const navigation = useNavigation();
     const { twitter } = useTwitter();    
     const [medias, setMedias] = useState< Media[]> ([])
@@ -69,6 +70,9 @@ const User = (props: any) =>{
     const [indexCarousel, setIndexCarousel] = useState(0)    
     const [excludeReplies, setExcludeReplies] = useState(false)
     const [includeRts, setIncludeRts] = useState(true)
+    const [lastTweetId, setLastTweetId] = useState(0)
+    const [enableButton, setEnableButton] = useState(true)
+    const [loadingMedias, setLoadingMedias] = useState(false)
 
     navigation.setOptions({
         title: user.screen_name,
@@ -85,11 +89,15 @@ const User = (props: any) =>{
         }       
         return url         
     }
-
+    //////
     function filterMediaInTweets(tweets: Tweet[]){
         let medias:Media[] = [];        
-        for (let index = 0; index < tweets.length; index++) {                                  
-            if (tweets[index].extended_entities !== undefined){                           
+        let lastId = 0
+        for (let index = 0; index < tweets.length; index++) {                                 
+            if (tweets[index].extended_entities !== undefined){ 
+
+                lastId = tweets[index].extended_entities.media[0].id;  
+                                                        
                 for (let j = 0; j <  tweets[index].extended_entities.media.length; j++) {                     
                     if(tweets[index].extended_entities.media[j].type === "photo"){                    
                         medias.push({
@@ -121,7 +129,7 @@ const User = (props: any) =>{
                     }                                     
                 }                
             }                    
-                
+              setLastTweetId(lastId)  
         return medias        
     }
 
@@ -130,9 +138,7 @@ const User = (props: any) =>{
             let index = medias.indexOf(media)
             setIndexCarousel(index)
             setIsModalCarouselVisible(true)
-        }else if(media.type === "video"){
-            console.log('video: ', media.video_info.variants[0].url);
-            
+        }else if(media.type === "video"){                        
             setCurrentVideo(media.video_info.variants[0].url)
             setIsModalVideoVisible(true)            
         }
@@ -161,6 +167,25 @@ const User = (props: any) =>{
         }      
     }
 
+    const FetchMoreDataButton = ()=> {
+        return (
+            <View>
+            { !loadingMedias ?
+            <TouchableOpacity onPress={()=>fetchMediasFromUser()} style={styles.fetchMoreDataButton}>
+                <MaterialCommunityIcons name="progress-download" size={24} color="#ddd" />
+            </TouchableOpacity>
+            : 
+            <View style={styles.fetchMoreDataButton}>
+                <ProgressBarAndroid 
+                                styleAttr="Small" 
+                                color="#ddd"                        
+                            /> 
+            </View>}
+            </View>
+        )
+    };
+
+
     useEffect(()=>{
         let r = medias.map(item =>{
             return {url:item.media_url}
@@ -169,17 +194,50 @@ const User = (props: any) =>{
         setImagesCarousel(r)
         
     }, [medias])
+    
+    function fetchMediasFromUser(){ 
+        setLoadingMedias(true)       
+        let params ={}        
+        if(lastTweetId !== 0){
+            params = {
+                screen_name: user.screen_name, 
+                count: TWEETS_COUNT, 
+                exclude_replies: excludeReplies,                
+                include_rts: includeRts,
+                max_id: lastTweetId
+            }                                                                            
+        }else{
+            params = {
+                screen_name: user.screen_name, 
+                count: TWEETS_COUNT, 
+                exclude_replies: excludeReplies,                
+                include_rts: includeRts,
+            }
+        }        
+        
+        twitter.get('statuses/user_timeline.json', params)
+        .then(resp=>{  
+            if(lastTweetId !== 0){                          
+                setMedias([...medias, ...filterMediaInTweets(resp) ])
+            }else{
+                setMedias(filterMediaInTweets(resp))
+            }
+            setLoadingMedias(false)
+        })
+    }
 
     useEffect(()=>{                
         twitter.setConsumerKey(Credentials.apiKey, Credentials.apiSecretKey);
         twitter.setAccessToken(Credentials.accessToken, Credentials.accessTokenSecret);                            
         
-        twitter.get('statuses/user_timeline.json', {screen_name: user.screen_name, count: TWEETS_COUNT, exclude_replies: excludeReplies, include_rts: includeRts})
-        .then(resp=>{                                    
-            setMedias(filterMediaInTweets(resp))
-        })       
+        fetchMediasFromUser()
     },[includeRts, excludeReplies])
             
+    function isCloseToBottom ({layoutMeasurement , contentOffset, contentSize}){
+        const paddingToBottom = 20;
+        return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+    };
+      
 
     const GalleryGridView = () =>(
         <View style={styles.galleryGridBox}>                        
@@ -271,7 +329,15 @@ const User = (props: any) =>{
                 </View>
             </Modal>                                                
             
-            <ScrollView>            
+            <ScrollView 
+                onScroll={({nativeEvent}) => {
+                if (isCloseToBottom(nativeEvent)) {
+                  setEnableButton(true)
+                  
+                }
+              }}
+                        
+            >            
 
                 <View style={styles.headerBox}>
                     <View style={{flexDirection:'row'}}>
@@ -295,19 +361,25 @@ const User = (props: any) =>{
 
                     <View style={styles.filterBox}>
                         <TouchableOpacity style={styles.filterItems}
-                            onPress={()=>setExcludeReplies(!excludeReplies)}
+                            onPress={()=>{
+                                setLastTweetId(0)
+                                setExcludeReplies(!excludeReplies)                                
+                            }}
                         >
                             <EvilIcons name="comment" size={32} color="#ccc" style={ !excludeReplies ? styles.filterItemsAtivated: {}}/>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.filterItems}
-                            onPress={()=>setIncludeRts(!includeRts)}
+                            onPress={()=>{
+                                setLastTweetId(0)
+                                setIncludeRts(!includeRts)
+                            }}
                         >
                             <EvilIcons name="retweet" size={32} color="#ccc" style={includeRts ? styles.filterItemsAtivated: {}}/>
                         </TouchableOpacity>                    
                     </View>
                 </View> 
 
-                <View style={styles.galleryBox}>                            
+                <View style={styles.galleryBox}>                                                                                                    
                         <View style={styles.exhibitionType}>
                             <TouchableOpacity style={styles.exhibitionBox}
                                 onPress={()=>setExhibitionMode("grid")}
@@ -327,8 +399,10 @@ const User = (props: any) =>{
                         <GalleryListView />                        
                     
                     }
+
+                    { protectedAccount ? <Text style={{color: "#ddd", marginTop: 50, fontSize: 20}}>Private Account</Text> : null}
                 </View>
-                                                
+                    { enableButton ? <FetchMoreDataButton />: null}                            
             </ScrollView>
             
         </View>

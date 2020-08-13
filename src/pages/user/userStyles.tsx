@@ -158,5 +158,10 @@ export default StyleSheet.create({
         height: 355,
         backgroundColor: 'grey',
         marginBottom: 5
-    }
+    },
+    fetchMoreDataButton:{
+        alignSelf: 'center',
+        marginTop: 10,
+        marginBottom: 10
+    },
 })

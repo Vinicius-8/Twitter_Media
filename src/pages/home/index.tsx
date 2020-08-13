@@ -33,14 +33,13 @@ const Home = () =>{
         
         loadData().then(username=>{
             
-            if(username){   
-                console.log('-->', username)             
+            if(username){                           
                 setLoadingUser(true)
                 twitter.get('users/search.json', {q:username,  count: 1})
                 .then(resp =>{      
                     setLoadingUser(false)              
                     userTouched(resp[0])             
-                })    
+                })
             }
         })
     },[])
@@ -50,23 +49,31 @@ const Home = () =>{
         return clipboardContent.toString();
     }
 
-
+    function validURL(str: string) {
+        var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+          '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+          '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+          '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+          '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+          '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        return !!pattern.test(str);
+      }
 
     async function loadData(){
-        let clipboardData = await readFromClipboard()        ;
-
-        let index1 = clipboardData.indexOf('twitter.com/') + 12;
-        clipboardData = clipboardData.slice(index1, clipboardData.length-1)
-        
-        let index2 = clipboardData.indexOf('/');
-        
-        if(index2 === -1){
-            let index3 = clipboardData.indexOf('?');            
-            clipboardData = clipboardData.slice(0, index3)        
-        }else{
-            clipboardData = clipboardData.slice(0, index2)            
-        }                   
-        return clipboardData
+        let clipboardData = await readFromClipboard();        
+        if(clipboardData.includes('twitter.com/') && validURL(clipboardData)){        
+            let index1 = clipboardData.indexOf('twitter.com/') + 12;                
+            clipboardData = clipboardData.slice(index1, clipboardData.length-1)            
+            let index2 = clipboardData.indexOf('/');        
+            if(index2 === -1){
+                let index3 = clipboardData.indexOf('?');            
+                clipboardData = clipboardData.slice(0, index3)        
+            }else{
+                clipboardData = clipboardData.slice(0, index2)            
+            }                   
+            return clipboardData    
+        }
+        return ''
     }
 
 
