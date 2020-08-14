@@ -87,7 +87,7 @@ const Home = () =>{
         Keyboard.dismiss()
         setLoadingUsers(true)        
         twitter.get('users/search.json', {q:username,  count: maxResults})
-        .then(resp =>{
+        .then(resp =>{                        
             setUsers(resp)   
             setLoadingUsers(false)         
         })                

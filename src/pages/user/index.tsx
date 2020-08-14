@@ -93,11 +93,9 @@ const User = (props: any) =>{
     function filterMediaInTweets(tweets: Tweet[]){
         let medias:Media[] = [];        
         let lastId = 0
-        for (let index = 0; index < tweets.length; index++) {                                 
-            if (tweets[index].extended_entities !== undefined){ 
-
-                lastId = tweets[index].extended_entities.media[0].id;  
-                                                        
+        for (let index = 0; index < tweets.length; index++) {                            
+            if (tweets[index].extended_entities !== undefined){                 
+                lastId = tweets[index].extended_entities.media[0].id;                                                          
                 for (let j = 0; j <  tweets[index].extended_entities.media.length; j++) {                     
                     if(tweets[index].extended_entities.media[j].type === "photo"){                    
                         medias.push({
@@ -402,7 +400,7 @@ const User = (props: any) =>{
 
                     { protectedAccount ? <Text style={{color: "#ddd", marginTop: 50, fontSize: 20}}>Private Account</Text> : null}
                 </View>
-                    { enableButton ? <FetchMoreDataButton />: null}                            
+                    { enableButton && !protectedAccount ? <FetchMoreDataButton />: null}                            
             </ScrollView>
             
         </View>

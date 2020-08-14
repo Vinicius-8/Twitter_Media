@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Ttedia",
+    "name": "Twitter Media Filter",
     "slug": "ttedia",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#040404"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -23,7 +23,18 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "com.oytu"
+      "package": "com.oytu.ttedia",
+      "adaptiveIcon":{
+        "backgroundColor": "#040404",
+        "foregroundImage":"./assets/adaptiveIcon.png"
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_PHONE_STATE",
+        "RECORD_AUDIO",
+        "READ_CONTACTS"
+      ]
     }
-  }
+    }
+    
 }
