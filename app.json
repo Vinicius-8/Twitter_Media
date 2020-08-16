@@ -2,7 +2,7 @@
   "expo": {
     "name": "Twitter Media Filter",
     "slug": "ttedia",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -24,6 +24,7 @@
     },
     "android": {
       "package": "com.oytu.ttedia",
+	  "versionCode": 3,
       "adaptiveIcon":{
         "backgroundColor": "#040404",
         "foregroundImage":"./assets/adaptiveIcon.png"

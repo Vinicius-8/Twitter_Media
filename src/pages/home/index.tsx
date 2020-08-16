@@ -116,7 +116,7 @@ const Home = () =>{
 
                 </Modal> 
             <View style={styles.inputBox}>
-                <Text style={styles.ibTitle}>Search for a account: </Text>
+                <Text style={styles.ibTitle}>Search for an account: </Text>
                 <TextInput 
                 placeholder=" username" 
                 autoCapitalize = 'none'

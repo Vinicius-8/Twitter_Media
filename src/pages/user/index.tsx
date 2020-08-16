@@ -65,7 +65,7 @@ const User = (props: any) =>{
     const [isModalCarouselVisible, setIsModalCarouselVisible] = useState(false)
     const [isModalVideoVisible, setIsModalVideoVisible] = useState(false);
     const [currentVideo, setCurrentVideo] = useState('')
-    const TWEETS_COUNT = 50   
+    const TWEETS_COUNT = 200   
     const [imagesCarousel, setImagesCarousel] = useState< ImagesCarousel[]>([])
     const [indexCarousel, setIndexCarousel] = useState(0)    
     const [excludeReplies, setExcludeReplies] = useState(false)
